@@ -1,25 +1,6 @@
-.i-container {
-  display: flex;
-  height: 100vh;
-}
-
-.i-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
-
-.i-background__image {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
 .i-content {
   position: absolute;
+  background-color: red;
   width: 20rem;
   right: 10rem;
   top: 10rem;
@@ -37,7 +18,6 @@
 }
 
 .i-content__text {
-  /* height: 10rem; */
   color: #616161;
   font-size: 14;
   font-weight: 400;

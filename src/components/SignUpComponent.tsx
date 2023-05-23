@@ -1,7 +1,6 @@
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  getIdToken,
   fetchSignInMethodsForEmail,
 } from "@firebase/auth";
 import { Card } from "antd";

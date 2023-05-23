@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
   getAuth,
   signInWithEmailAndPassword,
-  getIdToken,
 } from "@firebase/auth";
 import { useAppDispatch } from "../redux/store";
 import { setIsSignUp } from "../redux/slices/signUpSlice";
