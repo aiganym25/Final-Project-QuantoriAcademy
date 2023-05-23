@@ -9,13 +9,8 @@ export default function AuthorizationPage() {
 
   return (
     <div className="container">
-      <div className="container-background">
-        <img
-          src={DnaImage}
-          alt="logo"
-          className="container-background__image"
-        />
-      </div>
+      <img src={DnaImage} alt="logo" className="container-background-image" />
+
       {isSignUp ? <LoginComponent /> : <SignUpComponent />}
     </div>
   );
