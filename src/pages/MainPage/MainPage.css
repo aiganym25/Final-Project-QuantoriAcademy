@@ -1,4 +1,4 @@
-.content {
+.main-page-content {
   position: absolute;
   width: 20rem;
   right: 10rem;
@@ -9,21 +9,21 @@
   align-items: flex-start;
 }
 
-.content h1 {
+.main-page-content h1 {
   font-size: 32px;
   font-weight: 600;
   color: #000000;
   margin-bottom: 1rem;
 }
 
-.content__text {
+.main-page-content__text {
   color: #616161;
   font-size: 14;
   font-weight: 400;
   margin-bottom: 2rem;
 }
 
-.content__button {
+.main-page-content__button {
   background-color: white;
   padding: 1rem 4rem;
   border-radius: 24px;

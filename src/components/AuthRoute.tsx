@@ -10,7 +10,7 @@ export default function AuthRoute({ children }: Props) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => AuthCheck(), [auth]);
+  useEffect(() => AuthCheck());
   // will be called whenever our auth variable is changed
   const AuthCheck = onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -20,6 +20,6 @@ export default function AuthRoute({ children }: Props) {
       navigate("/auth");
     }
   });
-  if (loading) return <p>loading...</p>;
+  if (loading) {return <p>loading...</p>};
   return <>{children}</>;
 }

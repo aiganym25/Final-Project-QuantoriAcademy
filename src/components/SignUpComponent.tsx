@@ -1,63 +1,89 @@
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail,
-} from "@firebase/auth";
-import { Card } from "antd";
+import { getAuth, fetchSignInMethodsForEmail } from "@firebase/auth";
+import { Card, message } from "antd";
 import { Form, Input, Button } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { setIsSignUp } from "../redux/slices/signUpSlice";
 import { useAppDispatch } from "../redux/store";
-
+import { useAuth } from "../context/AuthContext";
 interface SignUpFormValues {
   email: string;
   password: string;
   confirmPassword: string;
 }
-export default function SignUpComponent() {
+export default function SignUpComponent(): JSX.Element {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const auth = getAuth();
   const [form] = Form.useForm();
   const [signUpError, setSignUpError] = useState<string | null>(null);
-  const [emailExistenceError, setEmailExistenceError] = useState<string | null>(
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordMatchError, setPasswordMatchError] = useState<string | null>(
     null
   );
+  const { createUser } = useAuth();
 
-  const checkEmailExistence = async () => {
+  const validateEmail = async (): Promise<void> => {
     const values = await form.validateFields(["email"]);
-    const signInMethods = await fetchSignInMethodsForEmail(auth, values.email);
+    // Valid email format
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(values.email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    // email existence
+    try {
+      const signInMethods = await fetchSignInMethodsForEmail(
+        auth,
+        values.email
+      );
 
-    if (signInMethods.length > 0) {
-      setEmailExistenceError("This email is already registered.");
-    } else {
-      setEmailExistenceError(null);
+      if (signInMethods.length > 0) {
+        setEmailError("This email is already registered.");
+        return;
+      } else {
+        setEmailError(null);
+      }
+    } catch (er) {
+      message.error("Woops! Something went wrong, please try later!");
     }
   };
 
-  const onFinish = async (values: SignUpFormValues) => {
-    try {
-      // password not match validation
-      if (values.password !== values.confirmPassword) {
-        setSignUpError("Passwords do not match");
-        return;
-      }
-      // password input validation
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[\s\S]{6,}$/;
-      if (!passwordRegex.test(values.password)) {
-        setSignUpError(
-          "Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number."
-        );
-        return;
-      }
+  const validatePasswordMatch = async (): Promise<void> => {
+    const password = await form.validateFields(["password"]);
+    const confirmPassword = await form.validateFields(["confirmPassword"]);
+    // password not match validation
+    if (password.password !== confirmPassword.confirmPassword) {
+      setPasswordMatchError("Passwords do not match");
+      return;
+    } else {
+      setPasswordMatchError(null);
+    }
+  };
+  const validatePassword = async (): Promise<void> => {
+    const password = await form.validateFields(["password"]);
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[\s\S]{6,}$/;
+    if (!passwordRegex.test(password.password)) {
+      setPasswordError(
+        "Password must be at least 6 characters long, have one lowercase, uppercase letter, and one number."
+      );
+      return;
+    } else {
+      setPasswordError(null);
+    }
+  };
 
-      // creating a user
-      setSignUpError("");
-      await createUserWithEmailAndPassword(auth, values.email, values.password);
-      navigate("/home");
-    } catch (error) {
-      setSignUpError("Sign up failed! Please try again.");
+  const onFinish = async (values: SignUpFormValues): Promise<void> => {
+    if (!!passwordError || !!emailError || !!passwordMatchError) {
+      try {
+        // creating a user
+        setSignUpError("");
+        await createUser(values.email, values.password);
+        navigate("/search");
+        // navigate("/search");
+      } catch (error) {
+        setSignUpError("Sign up failed! Please try again.");
+      }
     }
   };
   return (
@@ -75,20 +101,16 @@ export default function SignUpComponent() {
           label={
             <label style={{ fontWeight: 600, fontSize: "14px" }}>Email</label>
           }
-          validateStatus={signUpError || emailExistenceError ? "error" : ""}
-          help={emailExistenceError}
+          validateStatus={signUpError || emailError ? "error" : ""}
+          help={emailError}
           rules={[
-            {
-              type: "email",
-              message: "Please enter an valid email address",
-            },
             {
               required: true,
               message: "Email is required!",
             },
           ]}
         >
-          <Input placeholder="Enter your email" onBlur={checkEmailExistence} />
+          <Input placeholder="Enter your email" onBlur={validateEmail} />
         </Form.Item>
 
         <Form.Item
@@ -99,19 +121,19 @@ export default function SignUpComponent() {
               Password
             </label>
           }
-          validateStatus={signUpError ? "error" : ""}
+          validateStatus={signUpError || passwordError ? "error" : ""}
+          help={passwordError}
           rules={[
             {
               required: true,
               message: "Password is required",
             },
-            {
-              min: 6,
-              message: "Password must be at least 6 characters long",
-            },
           ]}
         >
-          <Input.Password placeholder="Enter your password" />
+          <Input.Password
+            placeholder="Enter your password"
+            onBlur={validatePassword}
+          />
         </Form.Item>
 
         <Form.Item
@@ -122,7 +144,8 @@ export default function SignUpComponent() {
               Repeat Password
             </label>
           }
-          validateStatus={signUpError ? "error" : ""}
+          validateStatus={signUpError || passwordMatchError ? "error" : ""}
+          help={passwordMatchError}
           rules={[
             {
               required: true,
@@ -130,7 +153,10 @@ export default function SignUpComponent() {
             },
           ]}
         >
-          <Input.Password placeholder="Enter your password again" />
+          <Input.Password
+            placeholder="Enter your password again"
+            onChange={validatePasswordMatch}
+          />
         </Form.Item>
 
         <div className="auth-form-error">{signUpError} </div>
@@ -139,11 +165,13 @@ export default function SignUpComponent() {
           <Button
             className="auth-form-button"
             htmlType="submit"
-            disabled={
-              !form.isFieldsTouched(true) ||
-              form.getFieldsError().filter(({ errors }) => errors.length)
-                .length > 0
-            }
+            // disabled={
+            //   !form.isFieldsTouched(true) ||
+            //   !!passwordError ||
+            //   !!emailError ||
+            //   !!passwordMatchError ||
+            //   !!signUpError
+            // }
           >
             Create Account
           </Button>

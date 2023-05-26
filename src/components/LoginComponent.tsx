@@ -1,29 +1,28 @@
 import { Form, Input, Button, Card } from "antd";
 import { useState } from "react";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-} from "@firebase/auth";
 import { useAppDispatch } from "../redux/store";
 import { setIsSignUp } from "../redux/slices/signUpSlice";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface LoginFormValues {
   email: string;
   password: string;
 }
-export default function LoginComponent() {
+export default function LoginComponent(): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const auth = getAuth();
   const [form] = Form.useForm();
   const [loginError, setLoginError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const onFinish = async (values: LoginFormValues) => {
+  const { login } = useAuth();
+
+  const onFinish = async (values: LoginFormValues): Promise<void> => {
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await login(values.email, values.password);
+      // await signInWithEmailAndPassword(auth, values.email, values.password);
       setLoginError("");
-      navigate("/home");
+      navigate("/search");
     } catch (error) {
       setLoginError(
         "Login failed! Please check your password and email and try again."
@@ -46,12 +45,7 @@ export default function LoginComponent() {
             <label style={{ fontWeight: 600, fontSize: "14px" }}>Email</label>
           }
           validateStatus={loginError ? "error" : ""}
-          // help={loginError}
           rules={[
-            {
-              type: "email",
-              message: "Please enter an valid email address",
-            },
             {
               required: true,
               message: "Email is required!",
@@ -70,15 +64,10 @@ export default function LoginComponent() {
             </label>
           }
           validateStatus={loginError ? "error" : ""}
-          // help={loginError}
           rules={[
             {
               required: true,
               message: "Password is required",
-            },
-            {
-              min: 6,
-              message: "Password must be at least 6 characters long",
             },
           ]}
         >

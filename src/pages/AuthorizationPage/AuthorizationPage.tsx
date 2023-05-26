@@ -4,7 +4,7 @@ import DnaImage from "../../assets/dna.png";
 import "./AuthorizationPage.css";
 import { useAppSelector } from "../../redux/store";
 
-export default function AuthorizationPage() {
+export default function AuthorizationPage(): JSX.Element {
   const isSignUp = useAppSelector((state) => state.signUp.isSignUp);
 
   return (
