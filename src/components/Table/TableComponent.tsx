@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CalculatorFilled } from "@ant-design/icons";
 import { message, Table } from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useState } from "react";
@@ -59,14 +58,17 @@ export default function TableComponent(): JSX.Element {
         message.error("An error occurred while fetching the data.");
       }
     };
-    fetchData();
-  }, [query, searchParams]);
+    if (query !== null) {
+      fetchData();
+    }
+  }, [query]);
 
   return (
     <>
       {query === null ? (
         <div
           style={{
+            height: "calc(100vh - 200px)",
             color: "#616161",
             fontWeight: 400,
             fontSize: "14px",

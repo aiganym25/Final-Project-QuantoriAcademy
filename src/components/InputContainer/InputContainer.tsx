@@ -1,5 +1,5 @@
 import { Button, Image, Input } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import FilterIcon from "../../assets/filter-icon.png";
 import "./InputContainer.css";
@@ -13,9 +13,12 @@ export default function InputContainer(): JSX.Element {
     setQuery(newQuery);
   };
   const handleSearch = (): void => {
-    setSearchParams({ query: query || "" });
-    window.location.reload(); // Reload the page
+    if (query !== null) {
+      setSearchParams({ query: query });
+      window.location.reload();
+    }
   };
+
   return (
     <div className="input-container">
       <Input
