@@ -14,7 +14,6 @@ import { AuthProvider } from "./context/AuthContext";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import ProteinPage from "./pages/ProteinPage/ProteinPage";
 
-// initializeApp(config.firebaseConfig);
 const lastPage = localStorage.getItem("lastPage");
 
 ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(

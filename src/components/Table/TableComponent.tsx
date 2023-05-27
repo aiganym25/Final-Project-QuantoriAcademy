@@ -25,7 +25,6 @@ export default function TableComponent(): JSX.Element {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(query);
     const fetchData = async (): Promise<void> => {
       try {
         const res = await fetch(
@@ -76,7 +75,6 @@ export default function TableComponent(): JSX.Element {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: "calc(100% - 48px)",
           }}
         >
           <div>No data to display</div>

@@ -1,5 +1,5 @@
-import { Button, Image, Input, message } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Image, Input } from "antd";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import FilterIcon from "../../assets/filter-icon.png";
 import "./InputContainer.css";
