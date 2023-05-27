@@ -32,10 +32,11 @@ ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(
             }
           />
           <Route path="/not-found" element={<NotFoundPage />} />
-          <Route
+          {/* <Route
             path="*"
             element={<Navigate to={lastPage || "/not-found"} />}
-          />
+          /> */}
+          <Route path="*" element={<Navigate to={"/not-found"} />} />
           <Route path="/protein/:id" element={<ProteinPage />} />
         </Routes>
       </AuthProvider>
