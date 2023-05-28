@@ -3,3 +3,25 @@
   align-items: center;
   justify-content: center;
 }
+
+.input-container__search {
+  flex-grow: 1;
+  margin-right: 1em;
+  height: 40px;
+}
+.input-container__button {
+  background-color: rgba(60, 134, 244, 0.2);
+  color: #3c86f4;
+  font-weight: 700;
+  font-size: 12px;
+  width: 180px;
+  margin-right: 1em;
+  height: 40px;
+}
+.input-container__filter {
+  background-color: rgba(60, 134, 244, 0.2);
+  color: #3c86f4;
+  font-weight: 700;
+  font-size: 12px;
+  height: 40px;
+}

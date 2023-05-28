@@ -24,7 +24,7 @@ export default function HeaderComponent(): JSX.Element {
             fontWeight: "600",
             textAlign: "center",
           }}
-          span={2}
+          span={4}
         >
           {user && user.email}
         </Col>

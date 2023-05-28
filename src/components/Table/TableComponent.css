@@ -1,0 +1,41 @@
+.no-data-text {
+  height: calc(100vh - 200px);
+  color: #616161;
+  font-weight: 400;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-result-text {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.entry-column {
+  color: #175bc0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gene-column {
+  font-weight: 600;
+}
+.organism-column {
+  border-radius: 12px;
+  padding: 2px 12px;
+  background-color: #d8e7ff;
+  text-align: center;
+  display: inline-block;
+}
+
+.subcellular-location-column {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+}

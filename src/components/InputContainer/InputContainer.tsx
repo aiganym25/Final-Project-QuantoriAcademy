@@ -1,12 +1,15 @@
 import { Button, Image, Input } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useAppDispatch } from "../../redux/store";
 import FilterIcon from "../../assets/filter-icon.png";
 import "./InputContainer.css";
+import { setSearchParamQuery } from "../../redux/slices/searchParamSLice";
 
 export default function InputContainer(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("query"));
+  const dispatch = useAppDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newQuery = e.target.value;
@@ -15,7 +18,12 @@ export default function InputContainer(): JSX.Element {
   const handleSearch = (): void => {
     if (query !== null) {
       setSearchParams({ query: query });
-      window.location.reload();
+      dispatch(setSearchParamQuery(query));
+    }
+  };
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
   };
 
@@ -25,37 +33,15 @@ export default function InputContainer(): JSX.Element {
         value={query || ""}
         placeholder="Enter search value"
         allowClear
-        style={{
-          flexGrow: 1,
-          marginRight: "1em",
-          height: "40px",
-        }}
+        className="input-container__search"
         onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
       />
-      <Button
-        style={{
-          backgroundColor: "rgba(60, 134, 244, 0.2)",
-          color: "#3C86F4",
-          fontWeight: 700,
-          fontSize: "12px",
-          width: "180px",
-          marginRight: "1em",
-          height: "40px",
-        }}
-        onClick={handleSearch}
-      >
+      <Button className="input-container__button" onClick={handleSearch}>
         Search
       </Button>
 
-      <Button
-        style={{
-          backgroundColor: "rgba(60, 134, 244, 0.2)",
-          color: "#3C86F4",
-          fontWeight: 700,
-          fontSize: "12px",
-          height: "40px",
-        }}
-      >
+      <Button className="input-container__filter">
         <Image src={FilterIcon} />
       </Button>
     </div>
