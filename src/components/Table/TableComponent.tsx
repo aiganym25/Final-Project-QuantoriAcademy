@@ -18,9 +18,9 @@ export default function TableComponent(): JSX.Element {
   const data = useAppSelector((state) => state.tableData.data);
   const [sortOrders, setSortOrders] = useState<SortOrders>({
     accession: "default",
-    genes: "default",
-    organism: "default",
-    locations: "default",
+    gene: "default",
+    organismName: "default",
+    id: "default",
     length: "default",
   });
   const resultText = `${data.length} Search Results for "${searchQuery}"`;
@@ -69,12 +69,15 @@ export default function TableComponent(): JSX.Element {
 
     const url: string = `${GET_SEARCH_REQUEST_API}&sort=${encodedParam}`;
 
+    setLoading(true);
     if (newSortOrder === "default") {
       dispatch(fetchProteins(GET_SEARCH_REQUEST_API));
     } else {
       dispatch(fetchProteins(url));
     }
+    setLoading(false);
   };
+
   return (
     <>
       {searchQuery === null || searchQuery === "" ? (
@@ -164,7 +167,7 @@ export default function TableComponent(): JSX.Element {
 
                   <img
                     src={
-                      sortOrders.organism !== "default"
+                      sortOrders.organismName !== "default"
                         ? SortActiveIcon
                         : SortIcon
                     }

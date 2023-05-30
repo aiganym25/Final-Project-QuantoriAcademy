@@ -29,7 +29,7 @@ export const TableDataSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProteins.fulfilled, (state, action) => {
-        console.log(action.payload.results);
+        // console.log(action.payload.results);
         const newEntities = action.payload.results.map(
           (
             result: {
