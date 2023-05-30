@@ -1,11 +1,11 @@
 import { Button, Input } from "antd";
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useAppDispatch } from "../../redux/store";
+import { useAppDispatch } from "../../state-management/store";
 import FilterIcon from "../../assets/filterIcon.svg";
 import FilterActiveIcon from "../../assets/filterActiveIcon.svg";
 import "./InputContainer.css";
-import { setSearchParamQuery } from "../../redux/slices/searchParamSLice";
+import { setSearchParamQuery } from "../../state-management/slices/searchParamSlice";
 import FilterModalComponent from "../../components/FilterModalComponent/FilterModalComponent";
 
 export default function InputContainer(): JSX.Element {

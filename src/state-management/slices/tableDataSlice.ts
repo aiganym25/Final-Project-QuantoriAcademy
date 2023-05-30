@@ -25,7 +25,7 @@ export const TableDataSlice = createSlice({
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProteins.pending, (state, action) => {
+      .addCase(fetchProteins.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchProteins.fulfilled, (state, action) => {
@@ -89,7 +89,7 @@ export const TableDataSlice = createSlice({
         state.data = newEntities;
         state.status = "idle";
       })
-      .addCase(fetchProteins.rejected, (state, action) => {
+      .addCase(fetchProteins.rejected, (state) => {
         state.status = "failed";
         message.error("Error occured while fetching the data");
       });

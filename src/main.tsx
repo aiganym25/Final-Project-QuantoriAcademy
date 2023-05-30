@@ -7,7 +7,7 @@ import MainPage from "./pages/MainPage/MainPage";
 // import { firebase } from "./config/firebase";
 import AuthorizationPage from "./pages/AuthorizationPage/AuthorizationPage";
 import { Provider } from "react-redux";
-import { store } from "./redux/store";
+import { store } from "./state-management/store";
 import HomePage from "./pages/HomePage/HomePage";
 import ProtectedRoute from "./components/Routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";

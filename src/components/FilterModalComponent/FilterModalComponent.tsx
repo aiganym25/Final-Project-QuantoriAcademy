@@ -1,15 +1,15 @@
 import { Col, Row, Divider, Input, Button } from "antd";
 import "./FilterModalComponent.css";
 import { useEffect, useState } from "react";
-import { useAppSelector, useAppDispatch } from "../../redux/store";
+import { useAppSelector, useAppDispatch } from "../../state-management/store";
 import { config, customSelectStyles } from "../../config/index";
 import Select from "react-select";
 import { fetchFilterOptions } from "../../service/fetchFilterOptions";
 import {
   FilterInterface,
   FilterOptionInterface,
-} from "../../interfaces/FilterOptionsInterface";
-import { fetchProteins } from "../../redux/slices/tableDataslice";
+} from "interfaces/FilterOptionsInterface";
+import { fetchProteins } from "../../state-management/slices/tableDataSlice";
 
 interface Props {
   isModalOpen: boolean;

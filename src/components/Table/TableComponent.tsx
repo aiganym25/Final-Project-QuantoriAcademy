@@ -2,12 +2,12 @@ import { Table, Spin } from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchProteins } from "../../redux/slices/tableDataslice";
-import { config } from "../../config/index";
-import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { fetchProteins } from "../../state-management/slices/tableDataSlice";
+import { useAppDispatch, useAppSelector } from "../../state-management/store";
 import "./TableComponent.css";
 import SortIcon from "../../assets/sort-icon.svg";
 import SortActiveIcon from "../../assets/sortActive.svg";
+import { config } from "../../config/index";
 
 interface SortOrders {
   [key: string]: "asc" | "desc" | "default";

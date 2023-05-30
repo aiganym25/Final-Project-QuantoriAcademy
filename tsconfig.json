@@ -21,8 +21,17 @@
 
     "baseUrl": ".",
     "paths": {
-      "src": ["./src/*"]
-    },
+      "src": ["./src"],
+      "components/*": ["./src/components/*"],
+      "config/*": ["./src/config/*"],
+      "state-management/*": ["src/state-management/*"],
+      "assets/*": ["./src/assets/*"],
+      "context/*": ["./src/context/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "service/*": ["./src/service/*"],
+      "interfaces/*": ["./src/interfaces/*"],
+      "pages/*": ["./src/pages/*"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

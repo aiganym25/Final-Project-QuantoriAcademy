@@ -2,7 +2,7 @@ import SignUpComponent from "../../components/SignUpComponent";
 import LoginComponent from "../../components/LoginComponent";
 import DnaImage from "../../assets/dna.png";
 import "./AuthorizationPage.css";
-import { useAppSelector } from "../../redux/store";
+import { useAppSelector } from "../../state-management/store";
 
 export default function AuthorizationPage(): JSX.Element {
   const isSignUp = useAppSelector((state) => state.signUp.isSignUp);

@@ -1,5 +1,5 @@
 import { Col, message, Row } from "antd";
-import { useAppSelector } from "../../../redux/store";
+import { useAppSelector } from "../../../state-management/store";
 import CopyIcon from "../../../assets/copy-icon.svg";
 import useCopyToClipboard from "../../../hooks/copyToClipboard";
 import "./DetailComponent.css";

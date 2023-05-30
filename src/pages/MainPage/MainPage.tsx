@@ -1,8 +1,8 @@
 import "./MainPage.css";
-import DnaImage from "../../assets/dna.png";
+import DnaImage from "assets/dna.png";
 import { useNavigate } from "react-router-dom";
 
-export default function MainPage() {
+export default function MainPage(): JSX.Element {
   const navigate = useNavigate();
   return (
     <div className="container">

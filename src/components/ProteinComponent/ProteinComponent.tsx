@@ -5,8 +5,8 @@ import type { TabsProps } from "antd";
 import "./ProteinComponent.css";
 import DetailComponent from "./DetailComponent/DetailComponent";
 import FeatureComponent from "./FeatureComponent/FeatureComponent";
-import { useAppDispatch } from "../../redux/store";
-import { updateProteinDetails } from "../../redux/slices/proteinSlice";
+import { useAppDispatch } from "../../state-management/store";
+import { updateProteinDetails } from "../../state-management/slices/proteinSlice";
 import PublicationComponent from "./PublicationComponent/PublicationComponent";
 
 interface ProteinInfoType {

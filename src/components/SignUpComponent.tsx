@@ -3,8 +3,8 @@ import { Card, message } from "antd";
 import { Form, Input, Button } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setIsSignUp } from "../redux/slices/signUpSlice";
-import { useAppDispatch } from "../redux/store";
+import { setIsSignUp } from "../state-management/slices/signUpSlice";
+import { useAppDispatch } from "../state-management/store";
 import { useAuth } from "../context/AuthContext";
 interface SignUpFormValues {
   email: string;
@@ -22,6 +22,8 @@ export default function SignUpComponent(): JSX.Element {
   const [passwordMatchError, setPasswordMatchError] = useState<string | null>(
     null
   );
+  const [loading, setLoading] = useState(false);
+
   const { createUser } = useAuth();
 
   const validateEmail = async (): Promise<void> => {
@@ -52,7 +54,7 @@ export default function SignUpComponent(): JSX.Element {
   const validatePasswordMatch = async (): Promise<void> => {
     const password = await form.validateFields(["password"]);
     const confirmPassword = await form.validateFields(["confirmPassword"]);
-    // password not match validation
+
     if (password.password !== confirmPassword.confirmPassword) {
       setPasswordMatchError("Passwords do not match");
       return;
@@ -74,21 +76,22 @@ export default function SignUpComponent(): JSX.Element {
   };
 
   const onFinish = async (values: SignUpFormValues): Promise<void> => {
-    if (!!passwordError || !!emailError || !!passwordMatchError) {
+    if (!passwordError || !emailError || !passwordMatchError) {
       try {
-        // creating a user
+        setLoading(true);
         setSignUpError("");
         await createUser(values.email, values.password);
         navigate("/search");
-        // navigate("/search");
       } catch (error) {
         setSignUpError("Sign up failed! Please try again.");
+      } finally {
+        setLoading(false);
       }
     }
   };
   return (
     <Card className="auth-container">
-      <p className="auth-title">Sign up</p>
+      <p className="auth__title">Sign up</p>
       <Form
         form={form}
         className="auth-form"
@@ -98,9 +101,7 @@ export default function SignUpComponent(): JSX.Element {
         <Form.Item
           required={false}
           name="email"
-          label={
-            <label style={{ fontWeight: 600, fontSize: "14px" }}>Email</label>
-          }
+          label={<label className="auth-form__title">Email</label>}
           validateStatus={signUpError || emailError ? "error" : ""}
           help={emailError}
           rules={[
@@ -116,11 +117,7 @@ export default function SignUpComponent(): JSX.Element {
         <Form.Item
           required={false}
           name="password"
-          label={
-            <label style={{ fontWeight: 600, fontSize: "14px" }}>
-              Password
-            </label>
-          }
+          label={<label className="auth-form__title">Password</label>}
           validateStatus={signUpError || passwordError ? "error" : ""}
           help={passwordError}
           rules={[
@@ -139,11 +136,7 @@ export default function SignUpComponent(): JSX.Element {
         <Form.Item
           required={false}
           name="confirmPassword"
-          label={
-            <label style={{ fontWeight: 600, fontSize: "14px" }}>
-              Repeat Password
-            </label>
-          }
+          label={<label className="auth-form__title">Repeat Password</label>}
           validateStatus={signUpError || passwordMatchError ? "error" : ""}
           help={passwordMatchError}
           rules={[
@@ -159,26 +152,20 @@ export default function SignUpComponent(): JSX.Element {
           />
         </Form.Item>
 
-        <div className="auth-form-error">{signUpError} </div>
+        <div className="auth-form__error">{signUpError} </div>
 
         <Form.Item>
           <Button
-            className="auth-form-button"
+            className="auth-form__button"
             htmlType="submit"
-            // disabled={
-            //   !form.isFieldsTouched(true) ||
-            //   !!passwordError ||
-            //   !!emailError ||
-            //   !!passwordMatchError ||
-            //   !!signUpError
-            // }
+            loading={loading}
           >
             Create Account
           </Button>
-          <div className="auth-form-text">
+          <div className="auth-form__text">
             Already have an account?
             <span
-              className="auth-form-text--bold"
+              className="auth-form__text--bold"
               onClick={() => dispatch(setIsSignUp(true))}
             >
               Log in
