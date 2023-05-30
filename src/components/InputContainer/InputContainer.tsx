@@ -1,20 +1,28 @@
-import { Button, Image, Input } from "antd";
-import { useState } from "react";
+import { Button, Input } from "antd";
+import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAppDispatch } from "../../redux/store";
-import FilterIcon from "../../assets/filter-icon.png";
+import FilterIcon from "../../assets/filterIcon.svg";
+import FilterActiveIcon from "../../assets/filterActiveIcon.svg";
 import "./InputContainer.css";
 import { setSearchParamQuery } from "../../redux/slices/searchParamSLice";
+import FilterModalComponent from "../../components/FilterModalComponent/FilterModalComponent";
 
 export default function InputContainer(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("query"));
   const dispatch = useAppDispatch();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleFilterModal = (): void => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newQuery = e.target.value;
     setQuery(newQuery);
   };
+
   const handleSearch = (): void => {
     if (query !== null) {
       setSearchParams({ query: query });
@@ -27,9 +35,12 @@ export default function InputContainer(): JSX.Element {
     }
   };
 
+  const inputRef = useRef(null);
+
   return (
     <div className="input-container">
       <Input
+        ref={inputRef}
         value={query || ""}
         placeholder="Enter search value"
         allowClear
@@ -41,9 +52,16 @@ export default function InputContainer(): JSX.Element {
         Search
       </Button>
 
-      <Button className="input-container__filter">
-        <Image src={FilterIcon} />
+      <Button
+        className={`input-container__filter ${isModalOpen && "active"}`}
+        onClick={toggleFilterModal}
+      >
+        <img src={isModalOpen ? FilterActiveIcon : FilterIcon} alt="" />
       </Button>
+      <FilterModalComponent
+        isModalOpen={isModalOpen}
+        setIsModal={setIsModalOpen}
+      />
     </div>
   );
 }

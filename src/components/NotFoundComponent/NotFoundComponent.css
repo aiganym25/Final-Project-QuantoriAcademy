@@ -18,3 +18,13 @@
   margin-top: 0;
   margin-bottom: 1em; /* Remove the default margin */
 }
+
+.not-found-container__button {
+  background-color: #d8e7ff;
+  color: #000000;
+  border-radius: 24px;
+  height: 48px;
+  width: 160px;
+  font-weight: 700;
+  font-size: 12px;
+}

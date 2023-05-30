@@ -1,3 +1,10 @@
+.title {
+  display: flex;
+  justify-content: space-between;
+}
+.title img {
+  cursor: pointer;
+}
 .no-data-text {
   height: calc(100vh - 200px);
   color: #616161;

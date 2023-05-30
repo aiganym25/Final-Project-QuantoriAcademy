@@ -20,15 +20,7 @@ export default function NotFoundComponent(): JSX.Element {
       <h1>404</h1>
       <p>Page not found</p>
       <Button
-        style={{
-          backgroundColor: "#D8E7FF",
-          color: "#000000",
-          borderRadius: "24px",
-          height: "48px",
-          width: "160px",
-          fontWeight: 700,
-          fontSize: "12px",
-        }}
+        className="not-found-container__button"
         onClick={handleBackToSearch}
       >
         Back to Search

@@ -8,9 +8,9 @@ const initialState = {
       key: 0,
       primaryAccession: "",
       uniProtkbId: "string",
-      genes: [""],
+      genes: "",
       organism: "",
-      locations: [""],
+      locations: "",
       length: 0,
     },
   ],
@@ -29,18 +29,50 @@ export const TableDataSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProteins.fulfilled, (state, action) => {
+        console.log(action.payload.results);
         const newEntities = action.payload.results.map(
-          (result: any, index: number) => {
-            const genes = result.genes
-              .map((gene: any) => gene.geneName.value)
-              .join(", ");
+          (
+            result: {
+              primaryAccession: string;
+              uniProtkbId: string;
+              genes?: {
+                orfNames?: { value: string }[];
+                geneName?: { value: string };
+              }[];
+              organism: { scientificName: string };
+              sequence: { length: number };
+              comments?: {
+                subcellularLocations: { location: { value: string } }[];
+              }[];
+            },
+            index: number
+          ) => {
+            let genes = "";
+            if (result.genes) {
+              if (result.genes[0]?.orfNames) {
+                genes = result.genes
+                  .map((gene) =>
+                    gene.orfNames?.map((value) => value.value).join(", ")
+                  )
+                  .join(", ");
+              } else if (result.genes[0]?.geneName) {
+                genes = result.genes
+                  .map((gene) => gene.geneName?.value)
+                  .join(", ");
+              }
+            }
             const organism = result.organism.scientificName;
             const length = result.sequence.length;
             const locations = result.comments
-              .map((el: any) =>
-                el.subcellularLocations.map((loc: any) => loc.location.value)
+              ?.map(
+                (el: {
+                  subcellularLocations: { location: { value: string } }[];
+                }) =>
+                  el.subcellularLocations.map(
+                    (loc: { location: { value: string } }) => loc.location.value
+                  )
               )
-              .join(", ");
+              ?.join(", ");
 
             return {
               key: index + 1,
@@ -62,7 +94,12 @@ export const TableDataSlice = createSlice({
         message.error("Error occured while fetching the data");
       });
   },
-  reducers: {},
+  reducers: {
+    setSortedData: (state, action) => {
+      state.data = action.payload;
+    },
+  },
 });
 
+export const { setSortedData } = TableDataSlice.actions;
 export default TableDataSlice.reducer;

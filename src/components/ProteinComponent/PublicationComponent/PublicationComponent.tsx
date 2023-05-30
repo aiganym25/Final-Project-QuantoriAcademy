@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { message } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -92,18 +89,7 @@ export default function PublicationComponent(): JSX.Element {
     <div>
       {publications &&
         publications.map((publication, index) => (
-          <div
-            key={index}
-            style={{
-              backgroundColor: "#F2F2F2",
-              borderRadius: "8px",
-              padding: "12px",
-              width: "100%",
-              wordWrap: "break-word",
-              fontSize: "12px",
-              marginBottom: "2em",
-            }}
-          >
+          <div key={index} className="publication__container ">
             <div className="publication__title">{publication.title}</div>
             <div className="publication__authors">
               <ul className="publication__author-list">

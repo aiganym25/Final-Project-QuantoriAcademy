@@ -25,3 +25,6 @@
   font-size: 12px;
   height: 40px;
 }
+.input-container__filter.active {
+  background-color: #3c86f4;
+}
