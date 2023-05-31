@@ -8,6 +8,11 @@ import "./TableComponent.css";
 import SortIcon from "../../assets/sort-icon.svg";
 import SortActiveIcon from "../../assets/sortActive.svg";
 import { config } from "../../config/index";
+import { fetchDataByChunks } from "../../service/fetchDataByChunks";
+import {
+  setNextDataUrl,
+  setRequestUrl,
+} from "../../state-management/slices/urlSlice";
 
 interface SortOrders {
   [key: string]: "asc" | "desc" | "default";
@@ -16,6 +21,8 @@ interface SortOrders {
 export default function TableComponent(): JSX.Element {
   const searchQuery = useAppSelector((state) => state.searchParam.searchQuery);
   const data = useAppSelector((state) => state.tableData.data);
+
+  const [dataLength, setDataLength] = useState<number>(0);
   const [sortOrders, setSortOrders] = useState<SortOrders>({
     accession: "default",
     gene: "default",
@@ -23,22 +30,45 @@ export default function TableComponent(): JSX.Element {
     id: "default",
     length: "default",
   });
-  const resultText = `${data.length} Search Results for "${searchQuery}"`;
+
+  const resultText = `${dataLength} Search Results for "${searchQuery}"`;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
-  const GET_SEARCH_REQUEST_API = `${
-    config.searchProteinURL
-  }(${encodeURIComponent(searchQuery ?? "")})`;
+  const requestURL = useAppSelector((state) => state.requestURL.requestUrl);
 
   useEffect(() => {
-    setLoading(true);
-    if (searchQuery !== null && searchQuery !== "") {
-      dispatch(fetchProteins(GET_SEARCH_REQUEST_API));
-    }
+    console.log(data);
+    const fetchData = async (url: string): Promise<void> => {
+      const { totalCount, nextPageUrl } = await fetchDataByChunks(url);
+      setDataLength(totalCount);
+      if (nextPageUrl) {
+        dispatch(fetchProteins(nextPageUrl));
+      }
+      if (nextPageUrl) {
+        dispatch(setRequestUrl(nextPageUrl));
+      }
+    };
 
-    setLoading(false);
-  }, [searchQuery, GET_SEARCH_REQUEST_API, dispatch]);
+    // Function to handle scrolling
+    const handleScroll = (): void => {
+      const { scrollTop, scrollHeight, clientHeight } =
+        document.documentElement;
+      const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight;
+
+      console.log(scrollTop + clientHeight);
+
+      if (isScrolledToBottom) {
+        fetchData(requestURL);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [dispatch, searchQuery, data]);
 
   const handleSort = (field: string): void => {
     const currentSortOrder = sortOrders[field];
@@ -54,7 +84,6 @@ export default function TableComponent(): JSX.Element {
 
     const newSortOrders: SortOrders = {};
 
-    // Reset the sort order of all other columns to "default"
     Object.keys(sortOrders).forEach((column) => {
       if (column === field) {
         newSortOrders[column] = newSortOrder;
@@ -67,11 +96,12 @@ export default function TableComponent(): JSX.Element {
 
     const encodedParam = encodeURIComponent(`${field} ${newSortOrder}`);
 
-    const url: string = `${GET_SEARCH_REQUEST_API}&sort=${encodedParam}`;
+    const url: string = `${config.searchProteinURL}&sort=${encodedParam}`;
+    dispatch(setRequestUrl(url));
 
     setLoading(true);
     if (newSortOrder === "default") {
-      dispatch(fetchProteins(GET_SEARCH_REQUEST_API));
+      dispatch(fetchProteins(config.searchProteinURL));
     } else {
       dispatch(fetchProteins(url));
     }
@@ -91,13 +121,16 @@ export default function TableComponent(): JSX.Element {
         <>
           <div className="search-result-text">{resultText}</div>
           <br />
-          <Table dataSource={data}>
+          <Table
+            dataSource={data}
+            pagination={false}
+            scroll={{ y: "calc(100vh - 100px)" }}
+          >
             <Column title="#" dataIndex="key" key="key" width="5%" />
             <Column
               title={
                 <div className="title">
                   <p>Entry</p>
-
                   <img
                     src={
                       sortOrders.accession !== "default"
@@ -125,7 +158,6 @@ export default function TableComponent(): JSX.Element {
               title={
                 <div className="title">
                   <p>Entry Names</p>
-
                   <img
                     src={
                       sortOrders.id !== "default" ? SortActiveIcon : SortIcon
@@ -143,7 +175,6 @@ export default function TableComponent(): JSX.Element {
               title={
                 <div className="title">
                   <p>Genes</p>
-
                   <img
                     src={
                       sortOrders.gene !== "default" ? SortActiveIcon : SortIcon
@@ -164,7 +195,6 @@ export default function TableComponent(): JSX.Element {
               title={
                 <div className="title">
                   <p>Organism</p>
-
                   <img
                     src={
                       sortOrders.organismName !== "default"
@@ -198,7 +228,6 @@ export default function TableComponent(): JSX.Element {
               title={
                 <div className="title">
                   <p>Length</p>
-
                   <img
                     src={
                       sortOrders.length !== "default"

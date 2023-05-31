@@ -1,43 +1,35 @@
 import "./index.css";
-
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import MainPage from "./pages/MainPage/MainPage";
-// import { initializeApp } from "firebase/app";
-// import { firebase } from "./config/firebase";
 import AuthorizationPage from "./pages/AuthorizationPage/AuthorizationPage";
 import { Provider } from "react-redux";
 import { store } from "./state-management/store";
 import HomePage from "./pages/HomePage/HomePage";
 import ProtectedRoute from "./components/Routes/ProtectedRoute";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./state-management/context/AuthContext";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import ProteinPage from "./pages/ProteinPage/ProteinPage";
-
-const lastPage = localStorage.getItem("lastPage");
+import { ROUTES } from "./routes/routesConfig";
 
 ReactDOM.createRoot(document.querySelector("#root") as HTMLElement).render(
   <BrowserRouter>
     <Provider store={store}>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/auth" element={<AuthorizationPage />} />
+          <Route path={ROUTES.MAIN} element={<MainPage />} />
+          <Route path={ROUTES.AUTH} element={<AuthorizationPage />} />
           <Route
-            path="/search"
+            path={ROUTES.HOME}
             element={
               <ProtectedRoute>
                 <HomePage />
               </ProtectedRoute>
             }
           />
-          <Route path="/not-found" element={<NotFoundPage />} />
-          {/* <Route
-            path="*"
-            element={<Navigate to={lastPage || "/not-found"} />}
-          /> */}
-          <Route path="*" element={<Navigate to={"/not-found"} />} />
-          <Route path="/protein/:id" element={<ProteinPage />} />
+          <Route path={ROUTES.NOTFOUND} element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to={ROUTES.NOTFOUND} />} />
+          <Route path={ROUTES.PROTEIN} element={<ProteinPage />} />
         </Routes>
       </AuthProvider>
     </Provider>

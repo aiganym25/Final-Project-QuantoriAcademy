@@ -4,6 +4,7 @@ import { SignUpSlice } from "./slices/signUpSlice";
 import { ProteinDetailsSlice } from "./slices/proteinSlice";
 import { SearchParamSlice } from "./slices/searchParamSlice";
 import { TableDataSlice } from "./slices/tableDataSlice";
+import { RequestURLSlice } from "./slices/urlSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     proteinDetails: ProteinDetailsSlice.reducer,
     searchParam: SearchParamSlice.reducer,
     tableData: TableDataSlice.reducer,
+    requestURL: RequestURLSlice.reducer,
   },
 });
 

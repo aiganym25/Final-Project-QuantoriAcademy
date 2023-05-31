@@ -5,7 +5,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { setIsSignUp } from "../state-management/slices/signUpSlice";
 import { useAppDispatch } from "../state-management/store";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../state-management/context/AuthContext";
+import { ROUTES } from "src/routes/routesConfig";
+
 interface SignUpFormValues {
   email: string;
   password: string;
@@ -81,7 +83,7 @@ export default function SignUpComponent(): JSX.Element {
         setLoading(true);
         setSignUpError("");
         await createUser(values.email, values.password);
-        navigate("/search");
+        navigate(ROUTES.HOME);
       } catch (error) {
         setSignUpError("Sign up failed! Please try again.");
       } finally {

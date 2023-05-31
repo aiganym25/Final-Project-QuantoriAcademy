@@ -1,7 +1,8 @@
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../state-management/context/AuthContext";
 import "./NotFoundComponent.css";
+import { ROUTES } from "src/routes/routesConfig";
 
 export default function NotFoundComponent(): JSX.Element {
   const navigate = useNavigate();
@@ -9,9 +10,9 @@ export default function NotFoundComponent(): JSX.Element {
 
   const handleBackToSearch = (): void => {
     if (user) {
-      navigate("/search");
+      navigate(ROUTES.HOME);
     } else {
-      navigate("/");
+      navigate(ROUTES.MAIN);
     }
   };
 

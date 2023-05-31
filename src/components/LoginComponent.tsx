@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useAppDispatch } from "../state-management/store";
 import { setIsSignUp } from "../state-management/slices/signUpSlice";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../state-management/context/AuthContext";
+import { ROUTES } from "src/routes/routesConfig";
 
 interface LoginFormValues {
   email: string;
@@ -24,7 +25,7 @@ export default function LoginComponent(): JSX.Element {
       setLoading(true);
       await login(values.email, values.password);
       setLoginError("");
-      navigate("/search");
+      navigate(ROUTES.HOME);
     } catch (error) {
       setLoginError(
         "Login failed! Please check your password and email and try again."

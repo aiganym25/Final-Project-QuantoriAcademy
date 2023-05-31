@@ -1,7 +1,9 @@
 import { Col, Divider, message, Row } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "context/AuthContext";
+import { useAuth } from "../../state-management/context/AuthContext";
 import "./HeaderComponent.css";
+import { ROUTES } from "src/routes/routesConfig";
+
 export default function HeaderComponent(): JSX.Element {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ export default function HeaderComponent(): JSX.Element {
     try {
       await logout();
       message.success("You have succefully logged out");
-      navigate("/");
+      navigate(ROUTES.MAIN);
     } catch (er) {
       message.error("Woops! Something went wrong. Please, try again!");
     }

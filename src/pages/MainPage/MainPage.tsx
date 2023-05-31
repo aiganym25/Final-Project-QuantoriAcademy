@@ -1,6 +1,7 @@
 import "./MainPage.css";
 import DnaImage from "assets/dna.png";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "src/routes/routesConfig";
 
 export default function MainPage(): JSX.Element {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function MainPage(): JSX.Element {
         </div>
         <div
           className="main-page-content__button"
-          onClick={() => navigate("/auth")}
+          onClick={() => navigate(ROUTES.AUTH)}
         >
           Login
         </div>

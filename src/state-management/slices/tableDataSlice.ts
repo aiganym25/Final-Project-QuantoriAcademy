@@ -1,23 +1,34 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { message } from "antd";
 
-const initialState = {
+interface Protein {
+  key: number;
+  primaryAccession: string;
+  uniProtkbId: string;
+  genes: string;
+  organism: string;
+  locations: string;
+  length: number;
+}
+
+interface TableDataState {
+  status: string;
+  data: Protein[];
+  lastKey: number;
+  linkHeader: string;
+}
+
+const initialState: TableDataState = {
   status: "",
-  data: [
-    {
-      key: 0,
-      primaryAccession: "",
-      uniProtkbId: "string",
-      genes: "",
-      organism: "",
-      locations: "",
-      length: 0,
-    },
-  ],
+  data: [],
+  lastKey: 0,
+  linkHeader: "",
 };
+
 export const fetchProteins = createAsyncThunk("search", async (api: string) => {
   const response = await fetch(api);
   return response.json();
+  // return response;
 });
 
 export const TableDataSlice = createSlice({
@@ -29,7 +40,6 @@ export const TableDataSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProteins.fulfilled, (state, action) => {
-        // console.log(action.payload.results);
         const newEntities = action.payload.results.map(
           (
             result: {
@@ -75,7 +85,7 @@ export const TableDataSlice = createSlice({
               ?.join(", ");
 
             return {
-              key: index + 1,
+              key: state.lastKey + index + 1,
               primaryAccession: result.primaryAccession,
               uniProtkbId: result.uniProtkbId,
               genes: genes,
@@ -86,20 +96,16 @@ export const TableDataSlice = createSlice({
           }
         );
 
-        state.data = newEntities;
+        state.data = [...state.data, ...newEntities];
+        state.lastKey = state.lastKey + newEntities.length;
         state.status = "idle";
       })
       .addCase(fetchProteins.rejected, (state) => {
         state.status = "failed";
-        message.error("Error occured while fetching the data");
+        message.error("Error occurred while fetching the data");
       });
   },
-  reducers: {
-    setSortedData: (state, action) => {
-      state.data = action.payload;
-    },
-  },
+  reducers: {},
 });
 
-export const { setSortedData } = TableDataSlice.actions;
 export default TableDataSlice.reducer;

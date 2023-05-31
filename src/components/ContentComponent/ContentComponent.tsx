@@ -1,4 +1,4 @@
-import "./Content.css";
+import "./ContentComponent.css";
 import InputContainer from "../InputContainer/InputContainer";
 import TableComponent from "../Table/TableComponent";
 
