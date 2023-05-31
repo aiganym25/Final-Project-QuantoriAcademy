@@ -2,7 +2,10 @@ import { Table, Spin } from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchProteins } from "../../state-management/slices/tableDataSlice";
+import {
+  fetchProteins,
+  setTableData,
+} from "../../state-management/slices/tableDataSlice";
 import { useAppDispatch, useAppSelector } from "../../state-management/store";
 import "./TableComponent.css";
 import SortIcon from "../../assets/sort-icon.svg";
@@ -13,6 +16,7 @@ import {
   setNextDataUrl,
   setRequestUrl,
 } from "../../state-management/slices/urlSlice";
+import { fetchFilteredData } from "../../service/fetchFilteredData";
 
 interface SortOrders {
   [key: string]: "asc" | "desc" | "default";
@@ -96,14 +100,22 @@ export default function TableComponent(): JSX.Element {
 
     const encodedParam = encodeURIComponent(`${field} ${newSortOrder}`);
 
-    const url: string = `${config.searchProteinURL}&sort=${encodedParam}`;
+    const url: string = `${config.searchProteinURL}${encodeURIComponent(
+      searchQuery ?? ""
+    )}&sort=${encodedParam}`;
     dispatch(setRequestUrl(url));
 
     setLoading(true);
+    const getFilteredData = async (api: string): Promise<void> => {
+      const sortedData = await fetchFilteredData(api);
+      dispatch(setTableData(sortedData));
+    };
     if (newSortOrder === "default") {
-      dispatch(fetchProteins(config.searchProteinURL));
+      getFilteredData(
+        `${config.searchProteinURL}${encodeURIComponent(searchQuery ?? "")}`
+      );
     } else {
-      dispatch(fetchProteins(url));
+      getFilteredData(url);
     }
     setLoading(false);
   };
