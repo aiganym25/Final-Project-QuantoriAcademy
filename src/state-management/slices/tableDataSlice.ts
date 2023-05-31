@@ -109,6 +109,7 @@ export const TableDataSlice = createSlice({
     setTableData: (state, action) => {
       state.data = [];
       state.data = action.payload;
+      state.lastKey = 0;
     },
   },
 });
