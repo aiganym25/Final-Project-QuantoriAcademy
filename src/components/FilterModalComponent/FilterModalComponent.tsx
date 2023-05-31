@@ -9,7 +9,11 @@ import {
   FilterInterface,
   FilterOptionInterface,
 } from "interfaces/FilterOptionsInterface";
-import { fetchProteins } from "../../state-management/slices/tableDataSlice";
+import {
+  fetchProteins,
+  setTableData,
+} from "../../state-management/slices/tableDataSlice";
+import { fetchFilteredData } from "../../service/fetchFilteredData";
 
 interface Props {
   isModalOpen: boolean;
@@ -47,6 +51,10 @@ export default function FilterModalComponent({
 
   const handleCancel = (): void => {
     setIsModal(false);
+    dispatch(setTableData([]));
+    const url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
+    console.log(url);
+    dispatch(fetchProteins(url));
     resetFields();
   };
 
@@ -75,7 +83,8 @@ export default function FilterModalComponent({
   };
 
   const initiateSearch = (filters: FilterInterface): void => {
-    let url = `${config.searchProteinURL}(${encodeURIComponent(query ?? "")})`;
+    let url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
+
     const { sequence_length_from, sequence_length_to, ...restFilters } =
       filters;
 
@@ -88,7 +97,13 @@ export default function FilterModalComponent({
         ` AND (length:[${sequence_length_from} TO ${sequence_length_to}])`
       );
     }
-    dispatch(fetchProteins(url));
+    // dispatch(fetchProteins(url));
+    const getFilteredData = async (api: string): Promise<void> => {
+      const data = await fetchFilteredData(api);
+      console.log(data);
+      dispatch(setTableData(data));
+    };
+    getFilteredData(url);
   };
 
   useEffect(() => {

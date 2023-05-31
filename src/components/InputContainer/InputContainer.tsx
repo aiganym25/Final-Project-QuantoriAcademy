@@ -1,25 +1,24 @@
 import { Button, Input } from "antd";
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useAppDispatch } from "../../state-management/store";
+import { useAppDispatch, useAppSelector } from "../../state-management/store";
 import FilterIcon from "../../assets/filterIcon.svg";
 import FilterActiveIcon from "../../assets/filterActiveIcon.svg";
 import "./InputContainer.css";
 import { setSearchParamQuery } from "../../state-management/slices/searchParamSlice";
 import FilterModalComponent from "../../components/FilterModalComponent/FilterModalComponent";
 import { config } from "../../config/index";
-import {
-  setNextDataUrl,
-  setRequestUrl,
-} from "../../state-management/slices/urlSlice";
+import { setRequestUrl } from "../../state-management/slices/urlSlice";
 import { fetchProteins } from "../../state-management/slices/tableDataSlice";
-import { fetchDataByChunks } from "../../service/fetchDataByChunks";
 
 export default function InputContainer(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("query"));
   const dispatch = useAppDispatch();
   const GET_SEARCH_REQUEST_API = config.searchProteinURL;
+  const searchParamQuery = useAppSelector(
+    (state) => state.searchParam.searchQuery
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleFilterModal = (): void => {
@@ -34,12 +33,15 @@ export default function InputContainer(): JSX.Element {
   const handleSearch = (): void => {
     if (query !== null) {
       setSearchParams({ query: query });
-      dispatch(setSearchParamQuery(query));
+
       const url = `${GET_SEARCH_REQUEST_API}(${encodeURIComponent(
         query ?? ""
       )})`;
       dispatch(setRequestUrl(url));
-      dispatch(fetchProteins(url));
+      if (searchParamQuery !== query) {
+        dispatch(fetchProteins(url));
+        dispatch(setSearchParamQuery(query));
+      }
       // set the link for next data
       // const getNextPageUrl = async (): Promise<void> => {
       //   const { nextPageUrl } = await fetchDataByChunks(url);

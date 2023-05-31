@@ -105,7 +105,12 @@ export const TableDataSlice = createSlice({
         message.error("Error occurred while fetching the data");
       });
   },
-  reducers: {},
+  reducers: {
+    setTableData: (state, action) => {
+      state.data = [];
+      state.data = action.payload;
+    },
+  },
 });
-
+export const { setTableData } = TableDataSlice.actions;
 export default TableDataSlice.reducer;

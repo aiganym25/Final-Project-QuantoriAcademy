@@ -39,36 +39,36 @@ export default function TableComponent(): JSX.Element {
 
   useEffect(() => {
     console.log(data);
-    const fetchData = async (url: string): Promise<void> => {
-      const { totalCount, nextPageUrl } = await fetchDataByChunks(url);
-      setDataLength(totalCount);
-      if (nextPageUrl) {
-        dispatch(fetchProteins(nextPageUrl));
-      }
-      if (nextPageUrl) {
-        dispatch(setRequestUrl(nextPageUrl));
-      }
-    };
+    // const fetchData = async (url: string): Promise<void> => {
+    //   const { totalCount, nextPageUrl } = await fetchDataByChunks(url);
+    //   setDataLength(totalCount);
+    //   if (nextPageUrl) {
+    //     dispatch(fetchProteins(nextPageUrl));
+    //   }
+    //   if (nextPageUrl) {
+    //     dispatch(setRequestUrl(nextPageUrl));
+    //   }
+    // };
 
-    // Function to handle scrolling
-    const handleScroll = (): void => {
-      const { scrollTop, scrollHeight, clientHeight } =
-        document.documentElement;
-      const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight;
+    // // Function to handle scrolling
+    // const handleScroll = (): void => {
+    //   const { scrollTop, scrollHeight, clientHeight } =
+    //     document.documentElement;
+    //   const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight;
 
-      console.log(scrollTop + clientHeight);
+    //   console.log(scrollTop + clientHeight);
 
-      if (isScrolledToBottom) {
-        fetchData(requestURL);
-      }
-    };
+    //   if (isScrolledToBottom) {
+    //     fetchData(requestURL);
+    //   }
+    // };
 
-    window.addEventListener("scroll", handleScroll);
+    // window.addEventListener("scroll", handleScroll);
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [dispatch, searchQuery, data]);
+    // return () => {
+    //   window.removeEventListener("scroll", handleScroll);
+    // };
+  }, [dispatch, searchQuery]);
 
   const handleSort = (field: string): void => {
     const currentSortOrder = sortOrders[field];
