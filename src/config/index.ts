@@ -5,6 +5,7 @@ export const config = Object.freeze({
     "https://rest.uniprot.org/uniprotkb/search?fields=accession,id,gene_names,organism_name,length,cc_subcellular_location&query=",
   filterProteinUrl:
     "https://rest.uniprot.org/uniprotkb/search?facets=model_organism,proteins_with,annotation_score&query=",
+  proteinInfoURl: "https://rest.uniprot.org/uniprotkb/",
 });
 export const customSelectStyles: StylesConfig = {
   container: (provided) => ({

@@ -2,18 +2,14 @@ import { Table, Spin } from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  fetchProteins,
-  setTableData,
-} from "../../state-management/slices/tableDataSlice";
+import { setTotalDataCount } from "../../state-management/slices/tableDataSlice";
 import { useAppDispatch, useAppSelector } from "../../state-management/store";
 import "./TableComponent.css";
 import SortIcon from "../../assets/sort-icon.svg";
 import SortActiveIcon from "../../assets/sortActive.svg";
 import { config } from "../../config/index";
-import { fetchDataByChunks } from "../../service/fetchDataByChunks";
+import { Protein, fetchDataByChunks } from "../../service/fetchDataByChunks";
 import { setRequestUrl } from "../../state-management/slices/urlSlice";
-import { fetchFilteredData } from "../../service/fetchFilteredData";
 
 interface SortOrders {
   [key: string]: "asc" | "desc" | "default";
@@ -21,8 +17,7 @@ interface SortOrders {
 
 export default function TableComponent(): JSX.Element {
   const searchQuery = useAppSelector((state) => state.searchParam.searchQuery);
-  const data = useAppSelector((state) => state.tableData.data);
-  const [dataLength, setDataLength] = useState<number>(0);
+  const dataLength = useAppSelector((state) => state.tableData.totalDataCount);
   const [sortOrders, setSortOrders] = useState<SortOrders>({
     accession: "default",
     gene: "default",
@@ -39,48 +34,49 @@ export default function TableComponent(): JSX.Element {
   const requestURL = useAppSelector((state) => state.requestURL.requestUrl);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const ref = useRef(null);
+  const [data, setData] = useState<Protein[]>([]);
 
-  const fetchData = async (url: string): Promise<void> => {
-    const { totalCount, nextPageUrl } = await fetchDataByChunks(url);
-    setDataLength(totalCount);
-
+  const fetchData = async (
+    url: string,
+    resetKeys: boolean = false
+  ): Promise<void> => {
+    console.log(data);
+    const { nextPageUrl, newEntities, totalDataCount } =
+      await fetchDataByChunks(url);
+    dispatch(setTotalDataCount(totalDataCount)); // setting total data count
+    if (newEntities.length !== 0) {
+      setData((prev) => [...prev, ...newEntities]); // adding new entities
+    } else {
+      setData([]);
+    }
     if (nextPageUrl) {
-      dispatch(fetchProteins(nextPageUrl));
-      dispatch(setRequestUrl(nextPageUrl));
+      dispatch(setRequestUrl(nextPageUrl)); // storing url for next entities
     }
   };
-  useEffect(() => {
-    // const options = {
-    //   root: null,
-    //   rootMargin: "0px",
-    //   threshold: 1.0,
-    // };
 
+  useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const lastRow = entries[0];
-
       if (lastRow.isIntersecting) {
         fetchData(requestURL);
       }
     });
-    console.log(ref.current);
     const observerElement = ref.current;
     if (observerElement) {
       observer.observe(observerElement);
     }
-
     return () => {
       if (observerElement) {
         observer.unobserve(observerElement);
       }
     };
-  }, [requestURL, hasMoreData, setMoreData]);
+  }, [data]);
+
   useEffect(() => {
-    if (isIntersecting && requestURL) {
-      console.log("fetching");
+    if (searchQuery !== null) {
       fetchData(requestURL);
     }
-  }, [isIntersecting, requestURL]);
+  }, [searchQuery]);
 
   const handleSort = (field: string): void => {
     const currentSortOrder = sortOrders[field];
@@ -114,16 +110,15 @@ export default function TableComponent(): JSX.Element {
     dispatch(setRequestUrl(url));
 
     setLoading(true);
-    const getFilteredData = async (api: string): Promise<void> => {
-      const sortedData = await fetchFilteredData(api);
-      dispatch(setTableData(sortedData));
-    };
+
     if (newSortOrder === "default") {
-      getFilteredData(
+      setData([]);
+      fetchData(
         `${config.searchProteinURL}${encodeURIComponent(searchQuery ?? "")}`
       );
     } else {
-      getFilteredData(url);
+      setData([]);
+      fetchData(url);
     }
     setLoading(false);
   };
@@ -151,7 +146,6 @@ export default function TableComponent(): JSX.Element {
                   ref: ref,
                   onClick: () => {
                     setMoreData(true);
-                    // ref.current = index;
                     console.log(ref.current);
                   },
                 };

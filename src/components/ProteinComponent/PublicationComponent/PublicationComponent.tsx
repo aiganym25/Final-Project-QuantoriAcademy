@@ -4,28 +4,11 @@ import { useParams } from "react-router-dom";
 import "./PublicationComponent.css";
 import LinkIcon from "../../../assets/link-icon.svg";
 import LinkInactiveIcon from "../../../assets/linkInactive.svg";
-
-interface PublicationType {
-  id: string;
-  citationType: string;
-  authors: string[];
-  citationCrossReferences: {
-    database: string;
-    id: string;
-  }[];
-  title: string;
-  categories: string;
-  citedFor: string;
-  journal: string;
-  volume: string;
-  firstPage: string;
-  lastPage: string;
-  publicationDate: string;
-}
+import { fetchProteinPublication } from "../../../service/fetchProteinPublication";
+import { PublicationInterface } from "../../../interfaces/PublicationInterface";
 
 export default function PublicationComponent(): JSX.Element {
   const { id } = useParams();
-  const [publications, setPublications] = useState<PublicationType[]>([]);
 
   const handlePudMedLink = (publicationId: string): void => {
     window.open(`https://pubmed.ncbi.nlm.nih.gov/${publicationId}`);
@@ -37,54 +20,18 @@ export default function PublicationComponent(): JSX.Element {
   const handleThirdLink = (publicationId: string): void => {
     window.open(`https://dx.doi.org/${publicationId}`);
   };
+  const [publications, setPublications] = useState<PublicationInterface[]>([]);
+
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      try {
-        const response = await fetch(
-          `https://rest.uniprot.org/uniprotkb/${id}/publications`
-        );
-
-        const resData = await response.json();
-        resData.results.forEach((res: any) => {
-          const publicationId = res.citation.id;
-          const citationType = res.citation.citationType;
-          const title = res.citation.title;
-          const authors = res.citation.authors;
-          const citationCrossReferences = res.citation.citationCrossReferences;
-          const citedFor = res.references.map(
-            (el: any) => el.referencePositions
-          );
-          const categories = res.references.map(
-            (el: any) => el.sourceCategories
-          );
-          const journal = res.citation.journal;
-          const volume = res.citation.volume;
-          const firstPage = res.citation.firstPage;
-          const lastPage = res.citation.lastPage;
-          const publicationDate = res.citation.publicationDate;
-
-          const data = {
-            id: publicationId,
-            citationType: citationType,
-            title: title,
-            authors: authors,
-            citationCrossReferences: citationCrossReferences,
-            citedFor: citedFor,
-            categories: categories,
-            journal: journal,
-            volume: volume,
-            firstPage: firstPage,
-            lastPage: lastPage,
-            publicationDate: publicationDate,
-          };
-          setPublications((prevData) => [...prevData, data]);
-        });
-      } catch (er) {
-        message.error("An error occurred while fetching the publications.");
+      if (id) {
+        const data = await fetchProteinPublication(id);
+        setPublications((prevData) => [...prevData, ...data]);
       }
     };
     fetchData();
   }, [id]);
+
   return (
     <div>
       {publications &&

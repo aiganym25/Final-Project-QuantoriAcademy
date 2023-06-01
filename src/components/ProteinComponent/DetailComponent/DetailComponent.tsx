@@ -10,7 +10,7 @@ export default function DetailComponent(): JSX.Element {
 
   return (
     <div>
-      <div style={{ fontSize: "16px", fontWeight: 600 }}>Sequence</div>
+      <div className="protein-details__title">Sequence</div>
       <div style={{ margin: "0.5em" }}>
         <Row style={{ marginBottom: "0.5em" }}>
           <Col span={4}>
@@ -42,14 +42,7 @@ export default function DetailComponent(): JSX.Element {
           </Col>
         </Row>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            fontWeight: "600",
-            fontSize: "12px",
-            cursor: "pointer",
-          }}
+          className="protein-details__copy"
           onClick={() => {
             copy(proteinDetails.value).then(() => {
               message.success("The key is copied");
@@ -60,19 +53,7 @@ export default function DetailComponent(): JSX.Element {
           <div style={{ marginLeft: "0.5em" }}>Copy</div>
         </div>
 
-        <div
-          style={{
-            backgroundColor: "#F2F2F2",
-            borderRadius: "8px",
-            padding: "12px",
-            width: "100%",
-            wordWrap: "break-word",
-            fontSize: "12px",
-            marginTop: "2em",
-          }}
-        >
-          {proteinDetails.value}
-        </div>
+        <div className="protein-details__key">{proteinDetails.value}</div>
       </div>
     </div>
   );

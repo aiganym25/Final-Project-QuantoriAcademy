@@ -9,11 +9,6 @@ import {
   FilterInterface,
   FilterOptionInterface,
 } from "interfaces/FilterOptionsInterface";
-import {
-  fetchProteins,
-  setTableData,
-} from "../../state-management/slices/tableDataSlice";
-import { fetchFilteredData } from "../../service/fetchFilteredData";
 
 interface Props {
   isModalOpen: boolean;
@@ -51,11 +46,11 @@ export default function FilterModalComponent({
 
   const handleCancel = (): void => {
     setIsModal(false);
-    dispatch(setTableData([]));
-    const url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
-    console.log(url);
-    dispatch(fetchProteins(url));
-    resetFields();
+    // dispatch(setTableData([]));
+    // const url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
+    // console.log(url);
+    // dispatch(fetchProteins(url));
+    // resetFields();
   };
 
   const resetFields = (): void => {
@@ -98,12 +93,12 @@ export default function FilterModalComponent({
       );
     }
     // dispatch(fetchProteins(url));
-    const getFilteredData = async (api: string): Promise<void> => {
-      const data = await fetchFilteredData(api);
-      console.log(data);
-      dispatch(setTableData(data));
-    };
-    getFilteredData(url);
+    // const getFilteredData = async (api: string): Promise<void> => {
+    //   const data = await fetchFilteredData(api);
+    //   console.log(data);
+    //   dispatch(setTableData(data));
+    // };
+    // getFilteredData(url);
   };
 
   useEffect(() => {

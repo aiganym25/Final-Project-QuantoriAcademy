@@ -19,3 +19,13 @@
   font-size: 12px;
   font-weight: 400;
 }
+.protein-section__organism {
+  border-radius: 18px;
+  padding: 2px 12px;
+  background-color: #d8e7ff;
+  font-size: 14px;
+  font-weight: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

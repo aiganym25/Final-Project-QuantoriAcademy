@@ -8,6 +8,7 @@ import FeatureComponent from "./FeatureComponent/FeatureComponent";
 import { useAppDispatch } from "../../state-management/store";
 import { updateProteinDetails } from "../../state-management/slices/proteinSlice";
 import PublicationComponent from "./PublicationComponent/PublicationComponent";
+import { config } from "../../config/index";
 
 interface ProteinInfoType {
   primaryAccession: string;
@@ -41,22 +42,22 @@ export default function ProteinComponent(): JSX.Element {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const fetchData = async (): Promise<void> => {
+    const fetchProteinComponentData = async (): Promise<void> => {
       try {
-        const response = await fetch(
-          `https://rest.uniprot.org/uniprotkb/${id}`
-        );
+        const response = await fetch(`${config.proteinInfoURl}${id}`);
 
         const resData = await response.json();
-        // console.log(resData);
+        console.log(resData);
         const data = {
           primaryAccession: resData.primaryAccession,
           uniProtkbId: resData.uniProtkbId,
           organism: resData.organism.scientificName,
           description: resData.proteinDescription.alternativeNames.map(
-            (names: any) => names.fullName.value
+            (names: { fullName: { value: string } }) => names.fullName.value
           ),
-          geneName: resData.genes.map((gene: any) => gene.geneName.value),
+          geneName: resData.genes.map(
+            (gene: { geneName: { value: string } }) => gene.geneName.value
+          ),
         };
         setProteinInfo(data);
 
@@ -68,12 +69,11 @@ export default function ProteinComponent(): JSX.Element {
           value: resData.sequence.value,
         };
         dispatch(updateProteinDetails(detail));
-        // console.log(detail);
       } catch (er) {
         message.error("An error occurred while fetching the protein.");
       }
     };
-    fetchData();
+    fetchProteinComponentData();
   }, [id, dispatch]);
   const proteinTitle = `${proteinInfo?.primaryAccession} / ${proteinInfo?.uniProtkbId}`;
   return (
@@ -82,20 +82,7 @@ export default function ProteinComponent(): JSX.Element {
         <div className="protein-section__title">
           {proteinTitle.toUpperCase()}
         </div>
-        <div
-          style={{
-            borderRadius: "18px",
-            padding: "2px 12px",
-            backgroundColor: "#D8E7FF",
-            fontSize: "14px",
-            fontWeight: "400px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {proteinInfo?.organism}
-        </div>
+        <div className="protein-section__organism">{proteinInfo?.organism}</div>
       </div>
       <br />
       <div className="protein-section__subtitle">Protein</div>

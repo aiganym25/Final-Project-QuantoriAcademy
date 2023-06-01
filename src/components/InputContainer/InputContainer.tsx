@@ -9,7 +9,6 @@ import { setSearchParamQuery } from "../../state-management/slices/searchParamSl
 import FilterModalComponent from "../../components/FilterModalComponent/FilterModalComponent";
 import { config } from "../../config/index";
 import { setRequestUrl } from "../../state-management/slices/urlSlice";
-import { fetchProteins } from "../../state-management/slices/tableDataSlice";
 
 export default function InputContainer(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,22 +31,15 @@ export default function InputContainer(): JSX.Element {
 
   const handleSearch = (): void => {
     if (query !== null) {
-      setSearchParams({ query: query });
+      setSearchParams({ query: query }); //меняем url
 
       const url = `${GET_SEARCH_REQUEST_API}(${encodeURIComponent(
         query ?? ""
       )})`;
       dispatch(setRequestUrl(url));
       if (searchParamQuery !== query) {
-        dispatch(fetchProteins(url));
-        dispatch(setSearchParamQuery(query));
+        dispatch(setSearchParamQuery(query)); // store search param query
       }
-      // set the link for next data
-      // const getNextPageUrl = async (): Promise<void> => {
-      //   const { nextPageUrl } = await fetchDataByChunks(url);
-      //   dispatch(setNextDataUrl(nextPageUrl));
-      // };
-      // getNextPageUrl();
     }
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
