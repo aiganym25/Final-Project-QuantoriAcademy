@@ -17,16 +17,18 @@ interface Props {
   isModalOpen: boolean;
   setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
   setData: React.Dispatch<React.SetStateAction<Protein[]>>;
+  setIsApplied: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function FilterModalComponent({
   isModalOpen,
   setIsModal,
+  setIsApplied,
   setData,
 }: Props): JSX.Element {
   const query = useAppSelector((state) => state.searchParam.searchQuery);
   const GET_FILTER_OPTIONS = `${config.filterProteinUrl}(${encodeURIComponent(
-    query ?? ""
+    query
   )})`;
   const dispatch = useAppDispatch();
 
@@ -40,9 +42,7 @@ export default function FilterModalComponent({
   const [popularOrganismsOptions, setPopularOrganismsOptions] = useState<
     FilterOptionInterface[]
   >([]);
-  // let requestUrl = useAppSelector((state) => state.requestURL.requestUrl);
 
-  // values
   const [geneName, setGeneName] = useState("");
   const [organism, setOrganism] = useState("");
   const [sequenceLengthFrom, setSequenceLengthFrom] = useState("");
@@ -53,11 +53,11 @@ export default function FilterModalComponent({
   const handleCancel = (): void => {
     setIsModal(false);
     setData([]);
-    const url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
+    const url = `${config.searchProteinURL}${encodeURIComponent(query)}`;
 
-    //fetch data po requestUrl, setData to fetchedData
     fetchFilteredData(url);
     resetFields();
+    setIsApplied(false);
   };
 
   const resetFields = (): void => {
@@ -72,14 +72,16 @@ export default function FilterModalComponent({
   const fetchFilteredData = async (url: string): Promise<void> => {
     const { nextPageUrl, newEntities, totalDataCount } =
       await fetchDataByChunks(url);
-    dispatch(setTotalDataCount(totalDataCount)); // setting total data count
+    dispatch(setTotalDataCount(totalDataCount));
     if (newEntities.length !== 0) {
-      setData((prev) => [...prev, ...newEntities]); // adding new entities
+      setData((prev) => [...prev, ...newEntities]);
+      setData(newEntities);
     } else {
       setData([]);
     }
+    dispatch(setRequestUrl(url));
     if (nextPageUrl) {
-      dispatch(setRequestUrl(nextPageUrl)); // storing url for next entities
+      dispatch(setRequestUrl(nextPageUrl));
     }
   };
   const handleApplyFilter = (): void => {
@@ -93,12 +95,18 @@ export default function FilterModalComponent({
     };
 
     setIsModal(false);
+    setIsApplied(true);
 
     initiateSearch(selectedFilters);
   };
 
   const initiateSearch = (filters: FilterInterface): void => {
-    let url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
+    let url = "";
+    if (query.trim() === "") {
+      url = `${config.searchProteinURL}*`;
+    } else {
+      url = `${config.searchProteinURL}${encodeURIComponent(query)}`;
+    }
 
     const { sequence_length_from, sequence_length_to, ...restFilters } =
       filters;
@@ -114,14 +122,10 @@ export default function FilterModalComponent({
     }
     setData([]);
     fetchFilteredData(url);
-
-    // fetchData, setData
-
-    // dispatch(setRequestUrl(url));
   };
 
   useEffect(() => {
-    if (isModalOpen && query !== null && query !== "") {
+    if (isModalOpen) {
       const fetchData = async (): Promise<void> => {
         const { annotationScores, proteinWith, popularOrganisms } =
           await fetchFilterOptions(query);
@@ -132,7 +136,7 @@ export default function FilterModalComponent({
 
       fetchData();
     }
-  }, [GET_FILTER_OPTIONS, isModalOpen, query, dispatch]);
+  }, [GET_FILTER_OPTIONS, isModalOpen, dispatch, setOrganism]);
 
   return (
     <div
@@ -161,7 +165,7 @@ export default function FilterModalComponent({
         styles={customSelectStyles}
         placeholder="Select an option"
         options={popularOrganismsOptions}
-        defaultValue={organism}
+        defaultValue={organism || undefined}
         onChange={(e: any) => setOrganism(e.value)}
       />
 

@@ -1,4 +1,4 @@
-import { message, Tabs } from "antd";
+import { message, Spin, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { TabsProps } from "antd";
@@ -40,14 +40,13 @@ export default function ProteinComponent(): JSX.Element {
   const { id } = useParams();
   const [proteinInfo, setProteinInfo] = useState<ProteinInfoType>();
   const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProteinComponentData = async (): Promise<void> => {
       try {
         const response = await fetch(`${config.proteinInfoURl}${id}`);
-
         const resData = await response.json();
-        console.log(resData);
         const data = {
           primaryAccession: resData.primaryAccession,
           uniProtkbId: resData.uniProtkbId,
@@ -69,6 +68,7 @@ export default function ProteinComponent(): JSX.Element {
           value: resData.sequence.value,
         };
         dispatch(updateProteinDetails(detail));
+        setLoading(false);
       } catch (er) {
         message.error("An error occurred while fetching the protein.");
       }
@@ -77,23 +77,31 @@ export default function ProteinComponent(): JSX.Element {
   }, [id, dispatch]);
   const proteinTitle = `${proteinInfo?.primaryAccession} / ${proteinInfo?.uniProtkbId}`;
   return (
-    <div className="protein-section">
-      <div style={{ display: "flex" }}>
-        <div className="protein-section__title">
-          {proteinTitle.toUpperCase()}
+    <>
+      {loading ? (
+        <Spin className="loading-spin" size="large" />
+      ) : (
+        <div className="protein-section">
+          <div style={{ display: "flex" }}>
+            <div className="protein-section__title">
+              {proteinTitle.toUpperCase()}
+            </div>
+            <div className="protein-section__organism">
+              {proteinInfo?.organism}
+            </div>
+          </div>
+          <br />
+          <div className="protein-section__subtitle">Protein</div>
+          <div className="protein-section__content">
+            {proteinInfo?.description?.join(", ")}
+          </div>
+          <div className="protein-section__subtitle">Gene</div>
+          <div className="protein-section__content">
+            {proteinInfo?.geneName?.join(", ")}
+          </div>
+          <Tabs defaultActiveKey="1" items={items} />
         </div>
-        <div className="protein-section__organism">{proteinInfo?.organism}</div>
-      </div>
-      <br />
-      <div className="protein-section__subtitle">Protein</div>
-      <div className="protein-section__content">
-        {proteinInfo?.description?.join(", ")}
-      </div>
-      <div className="protein-section__subtitle">Gene</div>
-      <div className="protein-section__content">
-        {proteinInfo?.geneName?.join(", ")}
-      </div>
-      <Tabs defaultActiveKey="1" items={items} />
-    </div>
+      )}
+    </>
   );
 }

@@ -8,7 +8,6 @@ export const fetchProteinPublication = async (
   try {
     const response = await fetch(`${config.proteinInfoURl}${id}/publications`);
     const resData = await response.json();
-    console.log(resData);
     const data: PublicationInterface[] = resData.results.map(
       (res: {
         citation: {

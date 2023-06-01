@@ -8,13 +8,16 @@ import "./InputContainer.css";
 import { setSearchParamQuery } from "../../state-management/slices/searchParamSlice";
 import { config } from "../../config/index";
 import { setRequestUrl } from "../../state-management/slices/urlSlice";
+import AppliedFilterIcon from "../../assets/appliedFilter-icon.svg";
 
 interface Props {
   isModalOpen: boolean;
+  isApplied: boolean;
   toggleFilterModal: () => void;
 }
 export default function InputContainer({
   isModalOpen,
+  isApplied,
   toggleFilterModal,
 }: Props): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,14 +35,16 @@ export default function InputContainer({
 
   const handleSearch = (): void => {
     if (query !== null) {
-      setSearchParams({ query: query }); //меняем url
-
-      const url = `${GET_SEARCH_REQUEST_API}(${encodeURIComponent(
-        query ?? "n%2Fa"
-      )})`;
-      dispatch(setRequestUrl(url));
       if (searchParamQuery !== query) {
-        dispatch(setSearchParamQuery(query)); // store search param query
+        if (query.trim() === "") {
+          dispatch(setSearchParamQuery("*")); // store search param query
+          const url = `${GET_SEARCH_REQUEST_API}(${encodeURIComponent("*")})`;
+          dispatch(setRequestUrl(url));
+        } else {
+          dispatch(setSearchParamQuery(query)); // store search param query
+          const url = `${GET_SEARCH_REQUEST_API}(${encodeURIComponent(query)})`;
+          dispatch(setRequestUrl(url));
+        }
       }
     }
   };
@@ -66,12 +71,23 @@ export default function InputContainer({
         Search
       </Button>
 
-      <Button
+      {/* <Button
         className={`input-container__filter ${isModalOpen && "active"}`}
         onClick={toggleFilterModal}
-      >
-        <img src={isModalOpen ? FilterActiveIcon : FilterIcon} alt="" />
-      </Button>
+      > */}
+      <img
+        style={{ cursor: "pointer" }}
+        onClick={toggleFilterModal}
+        src={
+          isModalOpen
+            ? FilterActiveIcon
+            : isApplied
+            ? AppliedFilterIcon
+            : FilterIcon
+        }
+        alt=""
+      />
+      {/* </Button> */}
     </div>
   );
 }

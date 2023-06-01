@@ -32,37 +32,38 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
   const resultText = `${dataLength} Search Results for "${searchQuery}"`;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hasMoreData, setMoreData] = useState(false);
   const requestURL = useAppSelector((state) => state.requestURL.requestUrl);
-  const [isIntersecting, setIsIntersecting] = useState(false);
   const ref = useRef(null);
-  // const [data, setData] = useState<Protein[]>([]);
 
   const fetchData = async (
     url: string,
-    resetKeys: boolean = false
+    isIntersecting = false
   ): Promise<void> => {
     const { nextPageUrl, newEntities, totalDataCount } =
       await fetchDataByChunks(url);
-    console.log(newEntities);
 
-    dispatch(setTotalDataCount(totalDataCount)); // setting total data count
-    if (newEntities.length !== 0) {
-      setData(newEntities); // adding new entities
-    } else {
+    dispatch(setTotalDataCount(totalDataCount));
+
+    if (newEntities.length !== 0 && !isIntersecting) {
+      setData(newEntities);
+    } else if (newEntities.length === 0) {
       setData([]);
+    } else if (newEntities.length !== 0 && isIntersecting && nextPageUrl) {
+      setData((prev) => [...prev, ...newEntities]);
     }
     if (nextPageUrl) {
-      dispatch(setRequestUrl(nextPageUrl)); // storing url for next entities
+      dispatch(setRequestUrl(nextPageUrl));
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const lastRow = entries[0];
       if (lastRow.isIntersecting) {
-        fetchData(requestURL);
+        fetchData(requestURL, true);
       }
     });
     const observerElement = ref.current;
@@ -74,15 +75,14 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
         observer.unobserve(observerElement);
       }
     };
-  }, []);
+  }, [data]);
 
   useEffect(() => {
-    if (searchQuery !== null) {
-      fetchData(requestURL);
-    }
+    fetchData(requestURL);
   }, [searchQuery]);
 
   const handleSort = (field: string): void => {
+    setLoading(true);
     const currentSortOrder = sortOrders[field];
 
     let newSortOrder: "asc" | "desc" | "default" = "default";
@@ -108,18 +108,19 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
 
     const encodedParam = encodeURIComponent(`${field} ${newSortOrder}`);
 
-    const url: string = `${config.searchProteinURL}${encodeURIComponent(
-      searchQuery ?? ""
-    )}&sort=${encodedParam}`;
+    let url: string = "";
+    if (searchQuery.trim() === "") {
+      url += `${config.searchProteinURL}*&sort=${encodedParam}`;
+    } else {
+      url = `${config.searchProteinURL}${encodeURIComponent(
+        searchQuery
+      )}&sort=${encodedParam}`;
+    }
     dispatch(setRequestUrl(url));
-
-    setLoading(true);
 
     if (newSortOrder === "default") {
       setData([]);
-      fetchData(
-        `${config.searchProteinURL}${encodeURIComponent(searchQuery ?? "")}`
-      );
+      fetchData(`${config.searchProteinURL}${encodeURIComponent(searchQuery)}`);
     } else {
       setData([]);
       fetchData(url);
@@ -134,18 +135,15 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
           <div>No data to display</div>
           <div>Please start search to display results</div>
         </div>
-      ) : loading ? (
-        <Spin size="large" />
       ) : (
         <>
           <div className="search-result-text">{resultText}</div>
           <br />
 
           <Table
+            loading={loading}
             onRow={(_, index) => {
               if (index === data.length - 1) {
-                // console.log(index);
-                // fetchData(requestURL);
                 return {
                   ref: ref,
                   onClick: () => {
@@ -156,7 +154,7 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
               }
               return {
                 onClick: () => {
-                  // console.log(index);
+                  console.log("");
                 },
               };
             }}
@@ -164,7 +162,13 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
             pagination={false}
             scroll={{ x: "calc(600px + 50%)", y: "calc(100vh - 300px)" }}
           >
-            <Column title="#" dataIndex="key" key="key" width="5%" />
+            <Column
+              title="#"
+              dataIndex="key"
+              key="key"
+              width="5%"
+              render={(_, __, index) => index + 1}
+            />
             <Column
               title={
                 <div className="title">
@@ -284,6 +288,7 @@ export default function TableComponent({ data, setData }: Props): JSX.Element {
           </Table>
         </>
       )}
+      {loading && <Spin size="large" className="loading-spin" />}
     </>
   );
 }

@@ -7,13 +7,12 @@ export async function fetchFilterOptions(query: string): Promise<{
   popularOrganisms: { value: string; label: string }[];
 }> {
   const GET_FILTER_OPTIONS = `${config.filterProteinUrl}(${encodeURIComponent(
-    query ?? ""
+    query
   )})`;
 
   try {
     const response = await fetch(GET_FILTER_OPTIONS);
     const responseData = await response.json();
-    console.log(responseData);
     const annotationScores = responseData.facets[2].values.map(
       (value: { value: string; count: number }) => ({
         value: value.value,

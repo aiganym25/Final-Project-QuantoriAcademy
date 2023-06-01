@@ -1,4 +1,5 @@
 import { message } from "antd";
+// let dataCounter = 0;
 
 export const fetchDataByChunks = async (
   api: string
@@ -29,7 +30,7 @@ const getNewEntities = async (api: string): Promise<Protein[]> => {
   try {
     const response = await fetch(api);
     const res = await response.json();
-
+    // dataCounter = res.results.length;
     const newEntities: Protein[] = res.results.map(
       (
         result: {

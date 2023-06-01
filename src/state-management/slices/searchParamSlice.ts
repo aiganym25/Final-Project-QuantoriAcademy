@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface SearchParamState {
-  searchQuery: string | null;
+  searchQuery: string;
 }
 
 const initialState: SearchParamState = {
-  searchQuery: null,
+  searchQuery: "*",
 };
 
 export const SearchParamSlice = createSlice({
