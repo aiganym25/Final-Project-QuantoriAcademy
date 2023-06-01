@@ -13,7 +13,7 @@ export async function fetchFilterOptions(query: string): Promise<{
   try {
     const response = await fetch(GET_FILTER_OPTIONS);
     const responseData = await response.json();
-
+    console.log(responseData);
     const annotationScores = responseData.facets[2].values.map(
       (value: { value: string; count: number }) => ({
         value: value.value,

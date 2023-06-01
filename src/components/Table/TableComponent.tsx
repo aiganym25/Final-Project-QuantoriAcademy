@@ -14,8 +14,11 @@ import { setRequestUrl } from "../../state-management/slices/urlSlice";
 interface SortOrders {
   [key: string]: "asc" | "desc" | "default";
 }
-
-export default function TableComponent(): JSX.Element {
+interface Props {
+  data: Protein[];
+  setData: React.Dispatch<React.SetStateAction<Protein[]>>;
+}
+export default function TableComponent({ data, setData }: Props): JSX.Element {
   const searchQuery = useAppSelector((state) => state.searchParam.searchQuery);
   const dataLength = useAppSelector((state) => state.tableData.totalDataCount);
   const [sortOrders, setSortOrders] = useState<SortOrders>({
@@ -34,18 +37,19 @@ export default function TableComponent(): JSX.Element {
   const requestURL = useAppSelector((state) => state.requestURL.requestUrl);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const ref = useRef(null);
-  const [data, setData] = useState<Protein[]>([]);
+  // const [data, setData] = useState<Protein[]>([]);
 
   const fetchData = async (
     url: string,
     resetKeys: boolean = false
   ): Promise<void> => {
-    console.log(data);
     const { nextPageUrl, newEntities, totalDataCount } =
       await fetchDataByChunks(url);
+    console.log(newEntities);
+
     dispatch(setTotalDataCount(totalDataCount)); // setting total data count
     if (newEntities.length !== 0) {
-      setData((prev) => [...prev, ...newEntities]); // adding new entities
+      setData(newEntities); // adding new entities
     } else {
       setData([]);
     }
@@ -70,7 +74,7 @@ export default function TableComponent(): JSX.Element {
         observer.unobserve(observerElement);
       }
     };
-  }, [data]);
+  }, []);
 
   useEffect(() => {
     if (searchQuery !== null) {

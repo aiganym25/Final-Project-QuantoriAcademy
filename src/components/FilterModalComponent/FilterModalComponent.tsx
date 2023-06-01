@@ -8,16 +8,21 @@ import { fetchFilterOptions } from "../../service/fetchFilterOptions";
 import {
   FilterInterface,
   FilterOptionInterface,
-} from "interfaces/FilterOptionsInterface";
+} from "../../interfaces/FilterOptionsInterface";
+import { setRequestUrl } from "../../state-management/slices/urlSlice";
+import { Protein, fetchDataByChunks } from "../../service/fetchDataByChunks";
+import { setTotalDataCount } from "../../state-management/slices/tableDataSlice";
 
 interface Props {
   isModalOpen: boolean;
   setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setData: React.Dispatch<React.SetStateAction<Protein[]>>;
 }
 
 export default function FilterModalComponent({
   isModalOpen,
   setIsModal,
+  setData,
 }: Props): JSX.Element {
   const query = useAppSelector((state) => state.searchParam.searchQuery);
   const GET_FILTER_OPTIONS = `${config.filterProteinUrl}(${encodeURIComponent(
@@ -35,6 +40,7 @@ export default function FilterModalComponent({
   const [popularOrganismsOptions, setPopularOrganismsOptions] = useState<
     FilterOptionInterface[]
   >([]);
+  // let requestUrl = useAppSelector((state) => state.requestURL.requestUrl);
 
   // values
   const [geneName, setGeneName] = useState("");
@@ -46,11 +52,12 @@ export default function FilterModalComponent({
 
   const handleCancel = (): void => {
     setIsModal(false);
-    // dispatch(setTableData([]));
-    // const url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
-    // console.log(url);
-    // dispatch(fetchProteins(url));
-    // resetFields();
+    setData([]);
+    const url = `${config.searchProteinURL}${encodeURIComponent(query ?? "")}`;
+
+    //fetch data po requestUrl, setData to fetchedData
+    fetchFilteredData(url);
+    resetFields();
   };
 
   const resetFields = (): void => {
@@ -62,6 +69,19 @@ export default function FilterModalComponent({
     setProteinsWith("");
   };
 
+  const fetchFilteredData = async (url: string): Promise<void> => {
+    const { nextPageUrl, newEntities, totalDataCount } =
+      await fetchDataByChunks(url);
+    dispatch(setTotalDataCount(totalDataCount)); // setting total data count
+    if (newEntities.length !== 0) {
+      setData((prev) => [...prev, ...newEntities]); // adding new entities
+    } else {
+      setData([]);
+    }
+    if (nextPageUrl) {
+      dispatch(setRequestUrl(nextPageUrl)); // storing url for next entities
+    }
+  };
   const handleApplyFilter = (): void => {
     const selectedFilters = {
       gene: geneName,
@@ -92,13 +112,12 @@ export default function FilterModalComponent({
         ` AND (length:[${sequence_length_from} TO ${sequence_length_to}])`
       );
     }
-    // dispatch(fetchProteins(url));
-    // const getFilteredData = async (api: string): Promise<void> => {
-    //   const data = await fetchFilteredData(api);
-    //   console.log(data);
-    //   dispatch(setTableData(data));
-    // };
-    // getFilteredData(url);
+    setData([]);
+    fetchFilteredData(url);
+
+    // fetchData, setData
+
+    // dispatch(setRequestUrl(url));
   };
 
   useEffect(() => {
@@ -113,7 +132,7 @@ export default function FilterModalComponent({
 
       fetchData();
     }
-  }, [GET_FILTER_OPTIONS, isModalOpen, query]);
+  }, [GET_FILTER_OPTIONS, isModalOpen, query, dispatch]);
 
   return (
     <div

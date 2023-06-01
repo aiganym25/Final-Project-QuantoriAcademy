@@ -6,11 +6,17 @@ import FilterIcon from "../../assets/filterIcon.svg";
 import FilterActiveIcon from "../../assets/filterActiveIcon.svg";
 import "./InputContainer.css";
 import { setSearchParamQuery } from "../../state-management/slices/searchParamSlice";
-import FilterModalComponent from "../../components/FilterModalComponent/FilterModalComponent";
 import { config } from "../../config/index";
 import { setRequestUrl } from "../../state-management/slices/urlSlice";
 
-export default function InputContainer(): JSX.Element {
+interface Props {
+  isModalOpen: boolean;
+  toggleFilterModal: () => void;
+}
+export default function InputContainer({
+  isModalOpen,
+  toggleFilterModal,
+}: Props): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("query"));
   const dispatch = useAppDispatch();
@@ -18,11 +24,6 @@ export default function InputContainer(): JSX.Element {
   const searchParamQuery = useAppSelector(
     (state) => state.searchParam.searchQuery
   );
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const toggleFilterModal = (): void => {
-    setIsModalOpen(!isModalOpen);
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newQuery = e.target.value;
@@ -34,7 +35,7 @@ export default function InputContainer(): JSX.Element {
       setSearchParams({ query: query }); //меняем url
 
       const url = `${GET_SEARCH_REQUEST_API}(${encodeURIComponent(
-        query ?? ""
+        query ?? "n%2Fa"
       )})`;
       dispatch(setRequestUrl(url));
       if (searchParamQuery !== query) {
@@ -71,10 +72,6 @@ export default function InputContainer(): JSX.Element {
       >
         <img src={isModalOpen ? FilterActiveIcon : FilterIcon} alt="" />
       </Button>
-      <FilterModalComponent
-        isModalOpen={isModalOpen}
-        setIsModal={setIsModalOpen}
-      />
     </div>
   );
 }
