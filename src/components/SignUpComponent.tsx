@@ -78,7 +78,7 @@ export default function SignUpComponent(): JSX.Element {
   };
 
   const onFinish = async (values: SignUpFormValues): Promise<void> => {
-    if (!passwordError || !emailError || !passwordMatchError) {
+    if (!passwordError && !emailError && !passwordMatchError) {
       try {
         setLoading(true);
         setSignUpError("");
