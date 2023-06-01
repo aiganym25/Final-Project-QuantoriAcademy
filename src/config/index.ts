@@ -27,3 +27,23 @@ export const customSelectStyles: StylesConfig = {
     transition: "all 0.2s",
   }),
 };
+export const protvistaConfig = {
+  categories: [
+    {
+      name: "category1",
+      label: "Category 1",
+      trackType: "protvista-track",
+      adapter: "protvista-feature-adapter",
+      url: "your-api-url",
+      tracks: [
+        {
+          name: "track1",
+          label: "Track 1",
+          filter: "filter-condition",
+          trackType: "protvista-track",
+          tooltip: "Track 1 tooltip",
+        },
+      ],
+    },
+  ],
+};
